@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/adrg/xdg"
 )
 
 func main() {
@@ -17,17 +19,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	link, err := getLink()
-	if err != nil {
-		log.Fatal(err)
-	}
+	for {
+		link, err := getLink()
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	ytdlpArgs, err := getArgs()
-	if err != nil {
-		log.Fatal(err)
-	}
+		if link == "" {
+			break
+		}
 
-	downloadLink(ytdlpPath, ytdlpArgs, link)
+		ytdlpArgs, err := getArgs()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		downloadLink(ytdlpPath, ytdlpArgs, link)
+	}
 }
 
 func check_ytdlp() (string, error) {
@@ -67,9 +75,11 @@ func getArgs() ([]string, error) {
 	}
 	contentType = strings.TrimSpace(contentType)
 	if contentType == "1" {
-		ytdlpArgs = []string{"-x", "--audio-format", "mp3"}
+		path := xdg.UserDirs.Music
+		ytdlpArgs = []string{"-x", "--audio-format", "mp3", "--output", path + "/%(title)s.%(ext)s"}
 	} else if contentType == "2" {
-		ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}
+		path := xdg.UserDirs.Videos
+		ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", path + "/%(title)s.%(ext)s"}
 	} else {
 		return nil, errors.New("invalid download type")
 	}
