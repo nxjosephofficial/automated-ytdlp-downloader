@@ -19,6 +19,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	check_dir(xdg.UserDirs.Music)
+	check_dir(xdg.UserDirs.Videos)
+
 	for {
 		link, err := getLink()
 		if err != nil {
@@ -44,6 +47,16 @@ func check_ytdlp() (string, error) {
 		return "", err
 	}
 	return path, nil
+}
+
+func check_dir(dir string) error {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err := os.Mkdir(dir, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func getLink() (string, error) {
