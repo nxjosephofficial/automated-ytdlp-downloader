@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -64,10 +65,13 @@ func getArgs() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if strings.TrimSpace(contentType) == "1" {
+	contentType = strings.TrimSpace(contentType)
+	if contentType == "1" {
 		ytdlpArgs = []string{"-x", "--audio-format", "mp3"}
+	} else if contentType == "2" {
+		ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}
 	} else {
-		ytdlpArgs = []string{""}
+		return nil, errors.New("invalid download type")
 	}
 	return ytdlpArgs, nil
 }
