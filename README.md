@@ -5,5 +5,5 @@ An interactive CLI tool for downloading Videos/Audios using [yt-dlp](https://git
 ## Features
 - Videos are being saved in ~/Videos
 - Audios are being saved in ~/Music
-- MP3 Download
+- MP3,M4A,WAV,FLAC,OPUS,OGG (Vorbis) Download
 - MP4 (Best) Download
