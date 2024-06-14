@@ -88,11 +88,11 @@ func getArgs() ([]string, error) {
 	}
 	contentType = strings.TrimSpace(contentType)
 	if contentType == "1" {
-		path := xdg.UserDirs.Music
-		ytdlpArgs = []string{"-x", "--audio-format", "mp3", "--output", path + "/%(title)s.%(ext)s"}
+		path := xdg.UserDirs.Music + "/%(title)s.%(ext)s"
+		ytdlpArgs = []string{"-x", "--audio-format", "mp3", "--output", path}
 	} else if contentType == "2" {
-		path := xdg.UserDirs.Videos
-		ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", path + "/%(title)s.%(ext)s"}
+		path := xdg.UserDirs.Videos + "/%(title)s.%(ext)s"
+		ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", path}
 	} else {
 		return nil, errors.New("invalid download type")
 	}
