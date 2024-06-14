@@ -89,7 +89,30 @@ func getArgs() ([]string, error) {
 	contentType = strings.TrimSpace(contentType)
 	if contentType == "1" {
 		path := xdg.UserDirs.Music + "/%(title)s.%(ext)s"
-		ytdlpArgs = []string{"-x", "--audio-format", "mp3", "--output", path}
+		var format string
+		fmt.Print("Choose format:\n1) mp3\t2) m4a\t3) wav\n4) flac\t5) opus\t6) ogg\n")
+		contentFormat, err := reader.ReadString('\n')
+		if err != nil {
+			return nil, err
+		}
+		contentFormat = strings.TrimSpace(contentFormat)
+		switch contentFormat {
+		case "1":
+			format = "mp3"
+		case "2":
+			format = "m4a"
+		case "3":
+			format = "wav"
+		case "4":
+			format = "flac"
+		case "5":
+			format = "opus"
+		case "6":
+			format = "vorbis"
+		default:
+			return nil, errors.New("invalid content format")
+		}
+		ytdlpArgs = []string{"-x", "--audio-format", format, "--output", path}
 	} else if contentType == "2" {
 		path := xdg.UserDirs.Videos + "/%(title)s.%(ext)s"
 		ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", path}
