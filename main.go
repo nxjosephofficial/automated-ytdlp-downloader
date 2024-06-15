@@ -23,7 +23,7 @@ func main() {
 	check_dir(xdg.UserDirs.Videos)
 
 	for {
-		link, err := getLink()
+		isPlaylist, link, err := getLink()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -32,7 +32,7 @@ func main() {
 			break
 		}
 
-		ytdlpArgs, err := getArgs()
+		ytdlpArgs, err := getArgs(isPlaylist)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -59,14 +59,18 @@ func check_dir(dir string) error {
 	return nil
 }
 
-func getLink() (string, error) {
+func getLink() (bool, string, error) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter link: ")
 	link, err := reader.ReadString('\n')
 	if err != nil {
-		return "", err
+		return false, "", err
 	}
-	return strings.TrimSpace(link), nil
+	var isPlaylist bool
+	if strings.Contains(link, "playlist") {
+		isPlaylist = true
+	}
+	return isPlaylist, strings.TrimSpace(link), nil
 }
 
 func downloadLink(ytdlpPath string, ytdlpArgs []string, link string) (string, error) {
@@ -78,7 +82,7 @@ func downloadLink(ytdlpPath string, ytdlpArgs []string, link string) (string, er
 	return string(output), nil
 }
 
-func getArgs() ([]string, error) {
+func getArgs(isPlaylist bool) ([]string, error) {
 	var ytdlpArgs []string
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Choose type: 1) Audio\t2) Video\n")
@@ -112,7 +116,12 @@ func getArgs() ([]string, error) {
 		default:
 			return nil, errors.New("invalid content format")
 		}
-		ytdlpArgs = []string{"-x", "--audio-format", format, "--output", path}
+		if isPlaylist {
+			path := xdg.UserDirs.Music
+			ytdlpArgs = []string{"-x", "--audio-format", format, "--output", fmt.Sprintf("%s/%%(playlist|)s/%%(playlist_index)s - %%(title)s.%%(ext)s", path)}
+		} else {
+			ytdlpArgs = []string{"-x", "--audio-format", format, "--output", path}
+		}
 	} else if contentType == "2" {
 		path := xdg.UserDirs.Videos + "/%(title)s.%(ext)s"
 		ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", path}
