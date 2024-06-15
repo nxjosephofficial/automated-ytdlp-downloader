@@ -16,28 +16,44 @@ func main() {
 
 	ytdlpPath, err := check_ytdlp()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("yt-dlp not found: %v", err)
 	}
 
-	check_dir(xdg.UserDirs.Music)
-	check_dir(xdg.UserDirs.Videos)
+	if err := check_dir(xdg.UserDirs.Music); err != nil {
+		log.Fatalf("Failed to check/create music directory: %v", err)
+	}
+	if err := check_dir(xdg.UserDirs.Videos); err != nil {
+		log.Fatalf("Failed to check/create videos directory: %v", err)
+	}
 
 	for {
 		isPlaylist, link, err := getLink()
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("Error getting link: %v", err)
+			continue
 		}
 
 		if link == "" {
+			fmt.Println("No link entered, exiting.")
 			break
 		}
 
 		ytdlpArgs, err := getArgs(isPlaylist)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("Error getting arguments: %v", err)
+			continue
 		}
 
-		downloadLink(ytdlpPath, ytdlpArgs, link)
+		output, err := downloadLink(ytdlpPath, ytdlpArgs, link)
+		if err != nil {
+			log.Printf("Error downloading link: %v", err)
+		} else {
+			if strings.Contains(output, "has already been downloaded") {
+				fmt.Println("It has already been downloaded.")
+			} else {
+				fmt.Println(output + "Download successful!")
+			}
+		}
 	}
 }
 
