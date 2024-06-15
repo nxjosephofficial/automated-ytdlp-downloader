@@ -1,4 +1,4 @@
-# automated-ytdlp-installer
+# automated-ytdlp-downloader
 
 An interactive CLI tool for downloading Videos/Audios using [yt-dlp](https://github.com/yt-dlp/yt-dlp) aimed for YouTube.
 
