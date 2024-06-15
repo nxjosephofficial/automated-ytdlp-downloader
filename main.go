@@ -140,11 +140,28 @@ func getArgs(isPlaylist bool) ([]string, error) {
 		}
 	} else if contentType == "2" {
 		path := xdg.UserDirs.Videos + "/%(title)s.%(ext)s"
+		var format string
+		fmt.Print("Choose format:\n1) mp4\t2) mkv\t3) webm\n")
+		contentFormat, err := reader.ReadString('\n')
+		if err != nil {
+			return nil, err
+		}
+		contentFormat = strings.TrimSpace(contentFormat)
+		switch contentFormat {
+		case "1":
+			format = "mp4"
+		case "2":
+			format = "mkv"
+		case "3":
+			format = "webm"
+		default:
+			return nil, errors.New("invalid content format")
+		}
 		if isPlaylist {
 			path := xdg.UserDirs.Videos
-			ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", fmt.Sprintf("%s/%%(playlist|)s/%%(playlist_index)s - %%(title)s.%%(ext)s", path)}
+			ytdlpArgs = []string{"--merge-output-format", format, "--output", fmt.Sprintf("%s/%%(playlist|)s/%%(playlist_index)s - %%(title)s.%%(ext)s", path)}
 		} else {
-			ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", path}
+			ytdlpArgs = []string{"--merge-output-format", format, "--output", path}
 		}
 	} else {
 		return nil, errors.New("invalid download type")
