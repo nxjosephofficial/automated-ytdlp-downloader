@@ -124,7 +124,12 @@ func getArgs(isPlaylist bool) ([]string, error) {
 		}
 	} else if contentType == "2" {
 		path := xdg.UserDirs.Videos + "/%(title)s.%(ext)s"
-		ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", path}
+		if isPlaylist {
+			path := xdg.UserDirs.Videos
+			ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", fmt.Sprintf("%s/%%(playlist|)s/%%(playlist_index)s - %%(title)s.%%(ext)s", path)}
+		} else {
+			ytdlpArgs = []string{"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--output", path}
+		}
 	} else {
 		return nil, errors.New("invalid download type")
 	}
