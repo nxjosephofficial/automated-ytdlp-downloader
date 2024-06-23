@@ -14,7 +14,7 @@ import (
 
 func main() {
 
-	ytdlpPath, err := check_ytdlp()
+	ytdlpPath, err := check_dependency("yt-dlp")
 	if err != nil {
 		log.Fatalf("yt-dlp not found: %v", err)
 	}
@@ -57,8 +57,8 @@ func main() {
 	}
 }
 
-func check_ytdlp() (string, error) {
-	path, err := exec.LookPath("yt-dlp")
+func check_dependency(dep string) (string, error) {
+	path, err := exec.LookPath(dep)
 	if err != nil {
 		return "", err
 	}
