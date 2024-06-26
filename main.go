@@ -51,7 +51,7 @@ func main() {
 			if strings.Contains(output, "has already been downloaded") {
 				fmt.Println("It has already been downloaded.")
 			} else {
-				fmt.Println(output + "Download successful!")
+				fmt.Println("Download successful!")
 			}
 		}
 	}
