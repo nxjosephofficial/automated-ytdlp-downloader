@@ -16,20 +16,22 @@ func main() {
 
 	ytdlpPath, err := check_dependency("yt-dlp")
 	if err != nil {
-		log.Fatalf("yt-dlp not found: %v", err)
+		log.Fatal(err)
 	}
 
-	if err := check_dir(xdg.UserDirs.Music); err != nil {
-		log.Fatalf("Failed to check/create music directory: %v", err)
+	err = check_dir(xdg.UserDirs.Music)
+	if err != nil {
+		log.Fatal(err)
 	}
-	if err := check_dir(xdg.UserDirs.Videos); err != nil {
-		log.Fatalf("Failed to check/create videos directory: %v", err)
+	err = check_dir(xdg.UserDirs.Templates)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	for {
 		isPlaylist, link, err := getLink()
 		if err != nil {
-			log.Printf("Error getting link: %v", err)
+			log.Fatal(err)
 			continue
 		}
 
@@ -40,13 +42,13 @@ func main() {
 
 		ytdlpArgs, err := getArgs(isPlaylist)
 		if err != nil {
-			log.Printf("Error getting arguments: %v", err)
+			log.Fatal(err)
 			continue
 		}
 
 		output, err := downloadLink(ytdlpPath, ytdlpArgs, link)
 		if err != nil {
-			log.Printf("Error downloading link: %v", err)
+			log.Fatal(err)
 		} else {
 			if strings.Contains(output, "has already been downloaded") {
 				fmt.Println("It has already been downloaded.")
@@ -60,7 +62,7 @@ func main() {
 func check_dependency(dep string) (string, error) {
 	path, err := exec.LookPath(dep)
 	if err != nil {
-		return "", err
+		return "", errors.New("dependency is not found: " + dep)
 	}
 	return path, nil
 }
@@ -69,7 +71,7 @@ func check_dir(dir string) error {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err := os.Mkdir(dir, os.ModePerm)
 		if err != nil {
-			return err
+			return errors.New("couldn't check/create directory: " + dir)
 		}
 	}
 	return nil
@@ -80,7 +82,7 @@ func getLink() (bool, string, error) {
 	fmt.Print("Enter link: ")
 	link, err := reader.ReadString('\n')
 	if err != nil {
-		return false, "", err
+		return false, "", errors.New("couldn't read link")
 	}
 	var isPlaylist bool
 	if strings.Contains(link, "playlist") {
@@ -93,9 +95,9 @@ func downloadLink(ytdlpPath string, ytdlpArgs []string, link string) (string, er
 	cmd := exec.Command(ytdlpPath, append(ytdlpArgs, link)...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", nil
+		return "", errors.New("couldn't download link")
 	}
-	return string(output), nil
+	return string(output), err
 }
 
 func getArgs(isPlaylist bool) ([]string, error) {
@@ -104,7 +106,7 @@ func getArgs(isPlaylist bool) ([]string, error) {
 	fmt.Print("Choose type: 1) Audio\t2) Video\n")
 	contentType, err := reader.ReadString('\n')
 	if err != nil {
-		return nil, err
+		return nil, errors.New("couldn't get arguments")
 	}
 	contentType = strings.TrimSpace(contentType)
 	if contentType == "1" {
@@ -113,7 +115,7 @@ func getArgs(isPlaylist bool) ([]string, error) {
 		fmt.Print("Choose format:\n1) mp3\t2) m4a\t3) wav\n4) flac\t5) opus\t6) ogg\n")
 		contentFormat, err := reader.ReadString('\n')
 		if err != nil {
-			return nil, err
+			return nil, errors.New("couldn't read content format")
 		}
 		contentFormat = strings.TrimSpace(contentFormat)
 		switch contentFormat {
@@ -144,7 +146,7 @@ func getArgs(isPlaylist bool) ([]string, error) {
 		fmt.Print("Choose format:\n1) mp4\t2) mkv\t3) webm\n")
 		contentFormat, err := reader.ReadString('\n')
 		if err != nil {
-			return nil, err
+			return nil, errors.New("couldn't read content format")
 		}
 		contentFormat = strings.TrimSpace(contentFormat)
 		switch contentFormat {
