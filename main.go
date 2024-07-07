@@ -118,20 +118,16 @@ func getArgs(isPlaylist bool) ([]string, error) {
 			return nil, errors.New("couldn't read content format")
 		}
 		contentFormat = strings.TrimSpace(contentFormat)
-		switch contentFormat {
-		case "1":
-			format = "mp3"
-		case "2":
-			format = "m4a"
-		case "3":
-			format = "wav"
-		case "4":
-			format = "flac"
-		case "5":
-			format = "opus"
-		case "6":
-			format = "vorbis"
-		default:
+		formatMap := map[string]string{
+			"1": "mp3",
+			"2": "m4a",
+			"3": "wav",
+			"4": "flac",
+			"5": "opus",
+			"6": "vorbis",
+		}
+		format, ok := formatMap[contentFormat]
+		if !ok {
 			return nil, errors.New("invalid content format")
 		}
 		if isPlaylist {
@@ -149,14 +145,13 @@ func getArgs(isPlaylist bool) ([]string, error) {
 			return nil, errors.New("couldn't read content format")
 		}
 		contentFormat = strings.TrimSpace(contentFormat)
-		switch contentFormat {
-		case "1":
-			format = "mp4"
-		case "2":
-			format = "mkv"
-		case "3":
-			format = "webm"
-		default:
+		formatMap := map[string]string{
+			"1": "mp4",
+			"2": "mkv",
+			"3": "webm",
+		}
+		format, ok := formatMap[contentFormat]
+		if !ok {
 			return nil, errors.New("invalid content format")
 		}
 		if isPlaylist {
