@@ -23,7 +23,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = check_dir(xdg.UserDirs.Templates)
+	err = check_dir(xdg.UserDirs.Videos)
 	if err != nil {
 		log.Fatal(err)
 	}
