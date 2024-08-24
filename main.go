@@ -100,24 +100,39 @@ func downloadLink(ytdlpPath string, ytdlpArgs []string, link string) (string, er
 	return string(output), err
 }
 
+func getFormat(reader *bufio.Reader, prompt string, formatMap map[string]string) (string, error) {
+	fmt.Print(prompt)
+	contentFormat, err := reader.ReadString('\n')
+	if err != nil {
+		return "", errors.New("couldn't read content format")
+	}
+	contentFormat = strings.TrimSpace(contentFormat)
+	format, ok := formatMap[contentFormat]
+	if !ok {
+		return "", errors.New("invalid content format")
+	}
+	return format, nil
+}
+
+func getContentType(reader *bufio.Reader, prompt string) (string, error) {
+	fmt.Print(prompt)
+	contentType, err := reader.ReadString('\n')
+	if err != nil {
+		return "", errors.New("couldn't get content type")
+	}
+	contentType = strings.TrimSpace(contentType)
+	return contentType, nil
+}
+
 func getArgs(isPlaylist bool) ([]string, error) {
 	var ytdlpArgs []string
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Choose type: 1) Audio\t2) Video\n")
-	contentType, err := reader.ReadString('\n')
+	contentType, err := getContentType(reader, "Choose type: 1) Audio\t2) Video\n")
 	if err != nil {
-		return nil, errors.New("couldn't get arguments")
+		return nil, err
 	}
-	contentType = strings.TrimSpace(contentType)
 	if contentType == "1" {
 		path := xdg.UserDirs.Music + "/%(title)s.%(ext)s"
-		var format string
-		fmt.Print("Choose format:\n1) mp3\t2) m4a\t3) wav\n4) flac\t5) opus\t6) ogg\n")
-		contentFormat, err := reader.ReadString('\n')
-		if err != nil {
-			return nil, errors.New("couldn't read content format")
-		}
-		contentFormat = strings.TrimSpace(contentFormat)
 		formatMap := map[string]string{
 			"1": "mp3",
 			"2": "m4a",
@@ -126,9 +141,9 @@ func getArgs(isPlaylist bool) ([]string, error) {
 			"5": "opus",
 			"6": "vorbis",
 		}
-		format, ok := formatMap[contentFormat]
-		if !ok {
-			return nil, errors.New("invalid content format")
+		format, err := getFormat(reader, "Choose format:\n1) mp3\t2) m4a\t3) wav\n4) flac\t5) opus\t6) vorbis\n", formatMap)
+		if err != nil {
+			return nil, err
 		}
 		if isPlaylist {
 			path := xdg.UserDirs.Music
@@ -138,21 +153,14 @@ func getArgs(isPlaylist bool) ([]string, error) {
 		}
 	} else if contentType == "2" {
 		path := xdg.UserDirs.Videos + "/%(title)s.%(ext)s"
-		var format string
-		fmt.Print("Choose format:\n1) mp4\t2) mkv\t3) webm\n")
-		contentFormat, err := reader.ReadString('\n')
-		if err != nil {
-			return nil, errors.New("couldn't read content format")
-		}
-		contentFormat = strings.TrimSpace(contentFormat)
 		formatMap := map[string]string{
 			"1": "mp4",
 			"2": "mkv",
 			"3": "webm",
 		}
-		format, ok := formatMap[contentFormat]
-		if !ok {
-			return nil, errors.New("invalid content format")
+		format, err := getFormat(reader, "Choose format:\n1) mp4\t2) mkv\t3) webm\n", formatMap)
+		if err != nil {
+			return nil, err
 		}
 		if isPlaylist {
 			path := xdg.UserDirs.Videos
