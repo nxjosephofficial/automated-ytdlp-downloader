@@ -8,3 +8,6 @@ An interactive CLI tool for downloading Videos/Audios using [yt-dlp](https://git
 - Audios are being saved in ~/Music
 - MP3,M4A,WAV,FLAC,OPUS,OGG (Vorbis) Download
 - MP4, MKV and WEBM Download
+
+## How does it look?
+![preview of program](./preview.svg)
